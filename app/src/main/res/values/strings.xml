@@ -3,10 +3,10 @@
     <string name="map_key" translatable="false">AIzaSyAN_Tx3AyWfQYasqI1QQi3aYnFDUkb-zEI</string>
     <string name="open">Open</string>
     <string name="close">Close</string>
+    <string name="title_activity_nearby_items">NearbyItems</string>
 
 
-</resources>
-    <!--    AIzaSyAN_Tx3AyWfQYasqI1QQi3aYnFDUkb-zEI-->
+</resources><!--    AIzaSyAN_Tx3AyWfQYasqI1QQi3aYnFDUkb-zEI-->
     <!--    AIzaSyDYoQybddM6c-Daz0bHVe7h2tuyzxHmW1k-->
     <!--    https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=28.4802,77.5340&radius=5500&type=restaurant&key=AIzaSyDYoQybddM6c-Daz0bHVe7h2tuyzxHmW1k -->
-<!--    https://maps.googleapis.com/maps/api/place/photo?maxwidth=1920&photoreference=kuch_bhi&key=AIzaSyDYoQybddM6c-Daz0bHVe7h2tuyzxHmW1k-->
+    <!--    https://maps.googleapis.com/maps/api/place/photo?maxwidth=1920&photoreference=kuch_bhi&key=AIzaSyDYoQybddM6c-Daz0bHVe7h2tuyzxHmW1k-->

@@ -1,8 +1,6 @@
 package com.example.home;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.os.AsyncTask;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,8 +8,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.RecyclerView.ViewHolder;
 
 import java.util.HashMap;
 import java.util.List;
@@ -19,6 +17,7 @@ import java.util.List;
 public class ListItemsAdapter extends RecyclerView.Adapter<ListItemsAdapter.ListItemHolder> {
 
     private List<HashMap<String,String>> list;
+    RecyclerView recyclerView;
     ImageView imageView;
 
     public ListItemsAdapter(List<HashMap<String,String>> list)
@@ -29,8 +28,10 @@ public class ListItemsAdapter extends RecyclerView.Adapter<ListItemsAdapter.List
     @NonNull
     @Override
     public ListItemHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        LayoutInflater layoutInflater=LayoutInflater.from(parent.getContext());
-        View view=layoutInflater.inflate(R.layout.list_items,parent,false);
+        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+        View view =  inflater.inflate(R.layout.list_items,parent, false);
+
+
         return new ListItemHolder(view);
     }
 

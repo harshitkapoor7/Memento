@@ -17,10 +17,16 @@ public class SplashActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.splashscreen);
+        int flag=0;
+        if (ConnChecker.check(getBaseContext()) == false) {
+            Intent intent = new Intent(this, ConnectionChecker.class);
+            flag=1;
+            startActivity(intent);
+            finish();
+        }
 
-
-
-            handler = new Handler();
+        handler = new Handler();
+        if(flag == 0) {
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
@@ -30,5 +36,9 @@ public class SplashActivity extends Activity {
                 }
             }, 5000);
         }
+
+
     }
+
+}
 

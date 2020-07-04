@@ -14,6 +14,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -127,6 +128,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             @Override
             public void onClick(View view) {
+                if (ConnChecker.check(getBaseContext()) == false) {
+
+                    Intent intent=new Intent(view.getContext(),ConnectionChecker.class);
+//                    getSupportActionBar().show();
+//                    getActionBar().show();
+                    startActivity(intent);
+                    finish();
+                }
+                search.setText("");
                 turnGpsOnAndFindLocation(0);
             }
         });
@@ -145,9 +155,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     public void turnGpsOnAndFindLocation(final int flag) {
         if (!lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            Toast.makeText(MainActivity.this, "Turn on GPS", Toast.LENGTH_LONG).show();
+            Toast.makeText(MainActivity.this, "Turn on GPS", Toast.LENGTH_SHORT).show();
             progressBar.setVisibility(View.VISIBLE);
             cancel.setVisibility(View.GONE);
+            Toast.makeText(MainActivity.this, "Fetching Your Location", Toast.LENGTH_LONG).show();
             new GpsUtils(MainActivity.this).turnGPSOn(new GpsUtils.onGpsListener() {
                 @Override
                 public void gpsStatus(boolean isGPSEnable) {
@@ -190,67 +201,82 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        int id = item.getItemId();
-        Object transferData[] = new Object[2];
-        transferData[0] = mMap;
-        GetNearbyPlaces getNearbyPlaces = new GetNearbyPlaces();
-        String url = "";
-        BottomSheetDialog bottomSheetDialog=new BottomSheetDialog();
-        recyclerView=(RecyclerView) findViewById(R.id.recycler_view);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext(),LinearLayoutManager.VERTICAL,false));
+        if (ConnChecker.check(getBaseContext()) == false) {
 
-
-
-        switch (id) {
-            case R.id.restaurant:
-                mMap.clear();
-                url = getURL(lat, lng, "restaurant");
-                transferData[1] = url;
-                getNearbyPlaces.execute(transferData);
-                List<HashMap<String,String>> list=getNearbyPlaces.nearbyPlacesList;
-
-                recyclerView.setAdapter(new ListItemsAdapter(list));
-
-                bottomSheetDialog.show(getSupportFragmentManager(),"abc");
-                break;
-            case R.id.hospital:
-                mMap.clear();
-                url = getURL(lat, lng, "hospital");
-                transferData[1] = url;
-                getNearbyPlaces.execute(transferData);
-                List<HashMap<String,String>> list1=getNearbyPlaces.nearbyPlacesList;
-                recyclerView.setAdapter(new ListItemsAdapter(list1));
-                bottomSheetDialog.show(getSupportFragmentManager(),"def");
-                break;
-            case R.id.malls:
-                mMap.clear();
-                url = getURL(lat, lng, "shopping_mall");
-                transferData[1] = url;
-                getNearbyPlaces.execute(transferData);
-                List<HashMap<String,String>> list2=getNearbyPlaces.nearbyPlacesList;
-                recyclerView.setAdapter(new ListItemsAdapter(list2));
-                bottomSheetDialog.show(getSupportFragmentManager(),"ghi");
-                break;
-            case R.id.hotel:
-                mMap.clear();
-                url = getURL(lat, lng, "lodging");
-                transferData[1] = url;
-                getNearbyPlaces.execute(transferData);
-                List<HashMap<String,String>> list3=getNearbyPlaces.nearbyPlacesList;
-                recyclerView.setAdapter(new ListItemsAdapter(list3));
-                bottomSheetDialog.show(getSupportFragmentManager(),"jkl");
-                break;
-            case R.id.atm:
-                mMap.clear();
-                url = getURL(lat, lng, "atm");
-                transferData[1] = url;
-                getNearbyPlaces.execute(transferData);
-                List<HashMap<String,String>> list4=getNearbyPlaces.nearbyPlacesList;
-                recyclerView.setAdapter(new ListItemsAdapter(list4));
-                bottomSheetDialog.show(getSupportFragmentManager(),"mno");
-                break;
+            Intent intent=new Intent(getApplicationContext(),ConnectionChecker.class);
+//                    getSupportActionBar().show();
+//                    getActionBar().show();
+            startActivity(intent);
+            finish();
         }
-        drawerLayout.closeDrawer(GravityCompat.START);
+        else {
+            int id = item.getItemId();
+            Object transferData[] = new Object[2];
+            transferData[0] = mMap;
+            GetNearbyPlaces getNearbyPlaces = new GetNearbyPlaces();
+            String url = "";
+//        BottomSheetDialog bottomSheetDialog=new BottomSheetDialog();
+//        LayoutInflater inflater= (LayoutInflater) getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+//        inflater.inflate(R.layout.bottom_sheet,null);
+//        recyclerView=findViewById(R.id.recycler_view);
+//        recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+
+
+            switch (id) {
+                case R.id.restaurant:
+                    mMap.clear();
+                    url = getURL(lat, lng, "restaurant");
+                    transferData[1] = url;
+                    getNearbyPlaces.execute(transferData);
+//                List<HashMap<String,String>> list=getNearbyPlaces.nearbyPlacesList;
+//                NearbyItems nearbyItems =new NearbyItems(list);
+//                nearbyItems.showRecyclerView();
+//                Intent i =new Intent(this,NearbyItems.class);
+//                startActivity(i);
+
+//                recyclerView.setAdapter(new ListItemsAdapter(getApplicationContext(),list));
+
+//                bottomSheetDialog.show(getSupportFragmentManager(),"abc");
+                    break;
+                case R.id.hospital:
+                    mMap.clear();
+                    url = getURL(lat, lng, "hospital");
+                    transferData[1] = url;
+                    getNearbyPlaces.execute(transferData);
+                    List<HashMap<String, String>> list1 = getNearbyPlaces.nearbyPlacesList;
+//                recyclerView.setAdapter(new ListItemsAdapter(list1));
+//                bottomSheetDialog.show(getSupportFragmentManager(),"def");
+                    break;
+                case R.id.malls:
+                    mMap.clear();
+                    url = getURL(lat, lng, "shopping_mall");
+                    transferData[1] = url;
+                    getNearbyPlaces.execute(transferData);
+//                List<HashMap<String,String>> list2=getNearbyPlaces.nearbyPlacesList;
+//                recyclerView.setAdapter(new ListItemsAdapter(list2));
+//                bottomSheetDialog.show(getSupportFragmentManager(),"ghi");
+                    break;
+                case R.id.hotel:
+                    mMap.clear();
+                    url = getURL(lat, lng, "lodging");
+                    transferData[1] = url;
+                    getNearbyPlaces.execute(transferData);
+//                List<HashMap<String,String>> list3=getNearbyPlaces.nearbyPlacesList;
+//                recyclerView.setAdapter(new ListItemsAdapter(list3));
+//                bottomSheetDialog.show(getSupportFragmentManager(),"jkl");
+                    break;
+                case R.id.atm:
+                    mMap.clear();
+                    url = getURL(lat, lng, "atm");
+                    transferData[1] = url;
+                    getNearbyPlaces.execute(transferData);
+                    List<HashMap<String, String>> list4 = getNearbyPlaces.nearbyPlacesList;
+//                recyclerView.setAdapter(new ListItemsAdapter(list4));
+//                bottomSheetDialog.show(getSupportFragmentManager(),"mno");
+                    break;
+            }
+            drawerLayout.closeDrawer(GravityCompat.START);
+        }
         return true;
     }
 

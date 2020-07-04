@@ -35,12 +35,13 @@ public class GetNearbyPlaces extends AsyncTask<Object,String,String> {
 
     @Override
     public void onPostExecute(String s) {
+        List<HashMap<String,String>> nearbyPlacesList=null;
         DataParser dataParser=new DataParser();
-        nearbyPlacesList = dataParser.parse(s);
-        DispayNearbyPlaces(nearbyPlacesList);
+        nearbyPlacesList=dataParser.parse(s);
+        DisplayNearbyPlaces(nearbyPlacesList);
     }
 
-    private void DispayNearbyPlaces(List<HashMap<String,String>> nearbyPlacesList){
+    private void DisplayNearbyPlaces(List<HashMap<String,String>> nearbyPlacesList){
         for(int i=0;i<nearbyPlacesList.size();i++){
             MarkerOptions markerOptions=new MarkerOptions();
             HashMap<String,String> nearbyPlace=nearbyPlacesList.get(i);
