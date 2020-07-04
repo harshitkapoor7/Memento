@@ -278,6 +278,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             drawerLayout.closeDrawer(GravityCompat.START);
         }
         return true;
+//        smak
     }
 
     @Override
