@@ -4,7 +4,8 @@
     <string name="open">Open</string>
     <string name="close">Close</string>
     <string name="title_activity_nearby_items">NearbyItems</string>
-
+    <string name="default_notification_channel_id">alarm_channel_id_01</string>
+    <color name="black">#000</color>
 
 </resources><!--    AIzaSyAN_Tx3AyWfQYasqI1QQi3aYnFDUkb-zEI-->
     <!--    AIzaSyDYoQybddM6c-Daz0bHVe7h2tuyzxHmW1k-->

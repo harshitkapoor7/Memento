@@ -8,7 +8,6 @@
     android:id="@+id/drawer_layout"
     tools:context=".MainActivity">
 
-
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:id="@+id/coordinatorLayout"
         android:layout_width="match_parent"
@@ -60,15 +59,7 @@
                     android:paddingRight="12dp"
                     android:src="@drawable/ic_cancel" />
 
-                <ProgressBar
-                    android:id="@+id/progressBar"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true"
-                    android:indeterminateDrawable="@drawable/progress"
-                    android:paddingRight="12dp"
-                    android:visibility="gone" />
+
 
 
             </RelativeLayout>
@@ -86,6 +77,12 @@
                 app:layout_constraintVertical_bias="0.024" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:id="@+id/centerPrgBar"
+            android:visibility="invisible"/>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/gps"

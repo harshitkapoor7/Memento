@@ -1,6 +1,12 @@
 package com.example.home;
 
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.view.LayoutInflater;
+import android.view.View;
+
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -35,7 +41,6 @@ public class GetNearbyPlaces extends AsyncTask<Object,String,String> {
 
     @Override
     public void onPostExecute(String s) {
-        List<HashMap<String,String>> nearbyPlacesList=null;
         DataParser dataParser=new DataParser();
         nearbyPlacesList=dataParser.parse(s);
         DisplayNearbyPlaces(nearbyPlacesList);
