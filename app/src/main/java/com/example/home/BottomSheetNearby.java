@@ -35,12 +35,12 @@ public class BottomSheetNearby extends BottomSheetDialogFragment {
         View view = inflater.inflate(R.layout.bottom_sheet_nearby, container, false);
         recyclerView = view.findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        ListItemsAdapter listItemsAdapter=new ListItemsAdapter(list,type);
+        ListItemsAdapter listItemsAdapter = new ListItemsAdapter(list, type);
         recyclerView.setAdapter(listItemsAdapter);
         listItemsAdapter.setOnItemClickListener(new ListItemsAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
-                String address=list.get(position).get("name")+" "+list.get(position).get("vicinity");
+                String address = list.get(position).get("name") + " " + list.get(position).get("vicinity");
                 dismiss();
                 BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(address);
                 bottomSheetDialog.show(getFragmentManager(), "bottom");
@@ -49,7 +49,7 @@ public class BottomSheetNearby extends BottomSheetDialogFragment {
         return view;
     }
 
-    public interface BottomSheetNearbyListener{
+    public interface BottomSheetNearbyListener {
         void onCardClick();
     }
 

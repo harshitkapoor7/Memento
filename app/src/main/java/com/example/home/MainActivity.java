@@ -3,6 +3,7 @@ package com.example.home;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlarmManager;
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -10,6 +11,7 @@ import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
@@ -26,7 +28,9 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 
+import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
@@ -35,6 +39,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -59,9 +64,13 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Type;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -174,7 +183,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     LatLng latLng = getLatLngFromAddress(search.getText().toString());
                     hideKeyboard(MainActivity.this);
                     moveCamera(latLng, DEFAULT_ZOOM, search.getText().toString());
-
+                    Handler handler=new Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(search.getText().toString());
+                            bottomSheetDialog.show(getSupportFragmentManager(), "bottom");
+                        }
+                    },1000);
                 }
             });
 
@@ -237,6 +253,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         return link.toString();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         if (ConnChecker.check(getBaseContext()) == false) {
@@ -256,6 +273,27 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             Handler handler=new Handler();
 
             switch (id) {
+                case R.id.remMenu:
+                    Intent intent=new Intent(this,MyReminders.class);
+                    SharedPreferences sharedPreferences=getSharedPreferences("SharedPreferences",MODE_PRIVATE);
+                    Gson gson=new Gson();
+                    String json1=sharedPreferences.getString("dataTitle",null);
+                    String json2=sharedPreferences.getString("dataBody",null);
+                    String json3=sharedPreferences.getString("dataTime",null);
+                    String json4=sharedPreferences.getString("dataDate",null);
+
+                    ArrayList<String> dt,db,dtime,ddate;
+                    Type type =new TypeToken<ArrayList<String>>() {}.getType();
+                    dt=gson.fromJson(json1,type);
+                    db=gson.fromJson(json2,type);
+                    dtime=gson.fromJson(json3,type);
+                    ddate=gson.fromJson(json4,type);
+                    intent.putExtra("dataTitle",dt);
+                    intent.putExtra("dataBody",db);
+                    intent.putExtra("dataTime",dtime);
+                    intent.putExtra("dataDate",ddate);
+                    startActivity(intent);
+                    break;
                 case R.id.restaurant:
                     mMap.clear();
                     pb.setBackgroundColor(getResources().getColor(R.color.black));
@@ -268,7 +306,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         @Override
                         public void run() {
                             list[0] =getNearbyPlaces.nearbyPlacesList;
-                            System.out.println(list[0] +"=list");
+//                            System.out.println(list[0] +"=list");
                             BottomSheetNearby bottomSheetNearby=new BottomSheetNearby(list[0],"res");
                             bottomSheetNearby.show(getSupportFragmentManager(), "bottomNearby");
                             pb.setVisibility(View.INVISIBLE);
@@ -289,7 +327,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         @Override
                         public void run() {
                             list[0] =getNearbyPlaces.nearbyPlacesList;
-                            System.out.println(list[0] +"=list");
+//                            System.out.println(list[0] +"=list");
                             BottomSheetNearby bottomSheetNearby=new BottomSheetNearby(list[0],"hos");
                             bottomSheetNearby.show(getSupportFragmentManager(), "bottomNearby");
                             pb.setVisibility(View.INVISIBLE);
@@ -309,7 +347,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         @Override
                         public void run() {
                             list[0] =getNearbyPlaces.nearbyPlacesList;
-                            System.out.println(list[0] +"=list");
+//                            System.out.println(list[0] +"=list");
                             BottomSheetNearby bottomSheetNearby=new BottomSheetNearby(list[0],"malls");
                             bottomSheetNearby.show(getSupportFragmentManager(), "bottomNearby");
                             pb.setVisibility(View.INVISIBLE);
@@ -329,7 +367,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         @Override
                         public void run() {
                             list[0] =getNearbyPlaces.nearbyPlacesList;
-                            System.out.println(list[0] +"=list");
+//                            System.out.println(list[0] +"=list");
                             BottomSheetNearby bottomSheetNearby=new BottomSheetNearby(list[0],"hotel");
                             bottomSheetNearby.show(getSupportFragmentManager(), "bottomNearby");
                             pb.setVisibility(View.INVISIBLE);
@@ -349,7 +387,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         @Override
                         public void run() {
                             list[0] =getNearbyPlaces.nearbyPlacesList;
-                            System.out.println(list[0] +"=list");
+//                            System.out.println(list[0] +"=list");
                             BottomSheetNearby bottomSheetNearby=new BottomSheetNearby(list[0],"atm");
                             bottomSheetNearby.show(getSupportFragmentManager(), "bottomNearby");
                             pb.setVisibility(View.INVISIBLE);
@@ -487,7 +525,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     int d,mon,y,h,min,df,monf,yf,hf,minf;
-    String address;
+    String address,body="";
     DatePickerDialog dpd;
     Calendar now;
 
@@ -515,6 +553,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     }
 
+    private ArrayList<String> dataTitle;
+    private ArrayList<String> dataBody,dataTime,dataDate;
+
     @Override
     public void onDateSet(DatePicker datePicker, int i, int i1, int i2) {
         now.set(Calendar.YEAR,i);
@@ -529,77 +570,124 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         now.set(Calendar.HOUR_OF_DAY,i);
         now.set(Calendar.MINUTE,i1);
 
+
+        final AlertDialog alertDialog=new AlertDialog.Builder(this).create();
+        View view=this.getLayoutInflater().inflate(R.layout.dialog_box,null);
+        final EditText editText=view.findViewById(R.id.note);
+        Button cancelIt=view.findViewById(R.id.cancel_it);
+        Button save=view.findViewById(R.id.save);
+
+
+        cancelIt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                alertDialog.dismiss();
+            }
+        });
+
+        save.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                body=editText.getText().toString();
+                editText.setText("");
+                callNotification();
+                alertDialog.dismiss();
+            }
+        });
+
+        alertDialog.setView(view);
+        alertDialog.show();
+
+
+    }
+
+    void callNotification(){
+//        count++;
+
+        y=now.get(Calendar.YEAR);
+        mon=now.get(Calendar.MONTH);
+        d=now.get(Calendar.DAY_OF_MONTH);
+        h=now.get(Calendar.HOUR_OF_DAY);
+        min=now.get(Calendar.MINUTE);
+
         System.out.println(now.get(Calendar.YEAR)+" "+
                 now.get(Calendar.MONTH)+" "+
                 now.get(Calendar.DAY_OF_MONTH)+" "+
                 now.get(Calendar.HOUR_OF_DAY)+" "+
                 now.get(Calendar.MINUTE));
 
+
+        SharedPreferences sharedPreferences1=getSharedPreferences("SharedPreferences",MODE_PRIVATE);
+        Gson gson=new Gson();
+        String json4=sharedPreferences1.getString("dataTime",null);
+        String json5=sharedPreferences1.getString("dataDate",null);
+        String json3=sharedPreferences1.getString("dataTitle",null);
+        String json2=sharedPreferences1.getString("dataBody",null);
+        Type type =new TypeToken<ArrayList<String>>() {}.getType();
+        dataTitle=gson.fromJson(json3,type);
+        dataBody=gson.fromJson(json2,type);
+        dataTime=gson.fromJson(json4,type);
+        dataDate=gson.fromJson(json5,type);
+
+
+        if(dataTitle == null){
+            dataTitle=new ArrayList<String>();
+            dataBody=new ArrayList<String>();
+            dataTime=new ArrayList<String>();
+            dataDate=new ArrayList<String>();
+        }
+
+        dataTitle.add(address);
+        dataBody.add(body);
+        if(min<10)
+            dataTime.add(h+":0"+min);
+        else
+            dataTime.add(h+":"+min);
+        dataDate.add(d+"/"+(mon+1)+"/"+y);
+
+        int request_Code=0;
+        for(int i=0;i<address.length();i++)
+            request_Code+=((int)address.charAt(i)*(int)address.charAt(i));
+        if(body!=null) {
+            for (int i = 0; i < body.length(); i++) {
+                request_Code+=((int)body.charAt(i)*(int)body.charAt(i));
+            }
+        }
+        request_Code%=Integer.MAX_VALUE;
+
+        SharedPreferences sharedPreferences=getSharedPreferences("SharedPreferences",MODE_PRIVATE);
+        SharedPreferences.Editor editor=sharedPreferences.edit();
+        Gson gson1=new Gson();
+        String json=gson1.toJson(dataTitle);
+        String json1=gson1.toJson(dataBody);
+        String json6=gson1.toJson(dataTime);
+        String json7=gson1.toJson(dataDate);
+        editor.putString("dataTitle",json);
+        editor.putString("dataBody",json1);
+        editor.putString("dataTime",json6);
+        editor.putString("dataDate",json7);
+        editor.apply();
+
         Calendar time=now;
-
-//        NotifyMe.Builder notifyMe=new NotifyMe.Builder(getApplicationContext());
-//        notifyMe.title(address).content("Notice").color(255,0,0,255)
-//                .led_color(255,255,255,255).time(time).addAction(new Intent(),"Snooze",false)
-//                .key("test").addAction(new Intent(),"Dismiss",true,false)
-//                .addAction(new Intent(),"Done").large_icon(R.mipmap.ic_launcher_round);
-//        notifyMe.build();
-
-//        Intent alarmIntent = new Intent(this, MyBroadcastReceiver.class);
-//        alarmIntent.putExtra("data", "Alarm manager example");
-//        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, alarmIntent, PendingIntent.FLAG_ONE_SHOT);
-//        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-//
-//        Calendar temp=Calendar.getInstance();
-//
-//        long mills=time.getTimeInMillis();
-//        mills-=temp.getTimeInMillis();
-//        long millsdup=SystemClock.elapsedRealtime();
-//        mills+=millsdup;
-//        System.out.println(mills+"  mills  " + millsdup);
-//
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-//            alarmManager.setExactAndAllowWhileIdle
-//                    (AlarmManager.ELAPSED_REALTIME_WAKEUP,
-//                            mills, pendingIntent);
-//        else
-//            alarmManager.setExact
-//                    (AlarmManager.ELAPSED_REALTIME_WAKEUP,
-//                            mills, pendingIntent);
-
 
         Intent alarmIntent = new Intent(this, MyBroadcastReceiver.class);
 
         alarmIntent.putExtra("address",address);
-
-//        if (ReminderNotificationType.CHANGE_LENS.equals(notificationType)) {
-//            alarmIntent.putExtra("NOTIFICATION_TYPE", "REMINDER");
-//        } else {
-//            alarmIntent.putExtra("NOTIFICATION_TYPE", "ORDER");
-//        }
+        alarmIntent.putExtra("body",body);
+        alarmIntent.putExtra("request_code",request_Code);
 
         Calendar temp=Calendar.getInstance();
-//
+
+
         long mills=time.getTimeInMillis();
         mills-=temp.getTimeInMillis();
         long millsdup=SystemClock.elapsedRealtime();
         mills+=millsdup;
         System.out.println(mills+"  mills  " + millsdup);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, alarmIntent, 0);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, request_Code, alarmIntent, 0);
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, mills, pendingIntent);
+
+        Toast.makeText(this,"Alarm set at "+h+":"+min+" on "+d+"/"+(mon+1)+"/"+y,Toast.LENGTH_LONG).show();
     }
 }
-
-//    NotificationManager notificationManager=(NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
-//        Notification notification=new Notification.Builder(getApplicationContext())
-//                .setContentTitle(address).setContentText("TESTING").setSmallIcon(R.mipmap.ic_launcher_round).build();
-//        notification.flags|=Notification.FLAG_AUTO_CANCEL;
-//        notificationManager.notify(0,notification);
-//        Intent intent=new Intent(this,MyBroadcastReceiver.class);
-//        intent.putExtra("cal",now);
-//        intent.putExtra("address",address);
-//        PendingIntent pendingIntent=PendingIntent.getBroadcast(this.getApplicationContext(),234324243,intent,0);
-//        AlarmManager alarmManager= (AlarmManager) getSystemService(ALARM_SERVICE);
-//        long mill=now.getTimeInMillis();
-//        alarmManager.set(AlarmManager.RTC_WAKEUP,mill,pendingIntent);
-//        Toast.makeText(this,"Event scheduled at "+h+":"+min+" "+d+"/"+(mon+1)+"/"+y,Toast.LENGTH_LONG).show();
