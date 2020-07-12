@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="20dp"
+    android:paddingLeft="20dp"
+    android:paddingRight="20dp"
+    android:paddingTop="20dp"
+    android:background="@drawable/background"
+    tools:context=".LoginActivity">
+
+
+    <LinearLayout
+        android:layout_centerVertical="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_margin="15dp"
+            android:fontFamily="@font/roboto_thin"
+            android:text="User Login"
+            android:textColor="#00ffff"
+            android:textSize="28dp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/editTextEmail"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="15dp"
+            android:layout_marginBottom="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginTop="20dp"
+            android:hint="Email"
+            android:backgroundTint="#00ffff"
+            android:fontFamily="@font/roboto_thin"
+            android:drawableLeft="@drawable/ic_email"
+            android:drawablePadding="10dp"
+            android:inputType="textEmailAddress"
+            android:layout_gravity="center"
+            android:textColor="#88d8c0"
+            android:textColorHint="#88d8c0"  />
+
+        <EditText
+            android:id="@+id/editTextPassword"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="15dp"
+            android:hint="Password"
+            android:backgroundTint="#00ffff"
+            android:fontFamily="@font/roboto_thin"
+            android:layout_gravity="center"
+            android:drawableLeft="@drawable/ic_password"
+            android:drawablePadding="10dp"
+            android:inputType="textPassword"
+            android:textColor="#88d8c0"
+            android:textColorHint="#88d8c0" />
+
+        <Button
+            android:id="@+id/buttonSignin"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="15dp"
+            android:fontFamily="@font/roboto_thin"
+            android:background="@drawable/login_signup_button"
+            android:text="Sign In"
+            android:textColor="#fff"/>
+
+        <TextView
+            android:id="@+id/textViewSignUp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="15dp"
+            android:fontFamily="@font/roboto_thin"
+            android:text="New to Home? Register Here"
+            android:textAlignment="center"
+            android:textColor="#00ffff" />
+
+    </LinearLayout>
+
+</RelativeLayout>

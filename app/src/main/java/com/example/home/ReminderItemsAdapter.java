@@ -45,7 +45,7 @@ public class ReminderItemsAdapter extends RecyclerView.Adapter<ReminderItemsAdap
         this.db = db;
         this.dTime = dTime;
         this.dDate = dDate;
-        sharedPreferences = context.getSharedPreferences("SharedPreferences", Context.MODE_PRIVATE);
+        sharedPreferences = context.getSharedPreferences(MainActivity.email, Context.MODE_PRIVATE);
         this.context = context;
         listener = (OnEditClickListener) context;
     }

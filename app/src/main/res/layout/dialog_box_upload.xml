@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardBackgroundColor="#296d98">
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_marginLeft="28dp"
+        android:layout_marginRight="28dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/selected_image"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="40dp"
+            app:layout_constraintBottom_toTopOf="@id/progress_horizontal_dialog"
+            android:src="@drawable/ic_image" />
+
+
+        <ProgressBar
+            android:id="@+id/progress_horizontal_dialog"
+            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+            app:layout_constraintTop_toBottomOf="@id/selected_image"
+            app:layout_constraintBottom_toTopOf="@id/fake"
+            android:layout_marginBottom="20dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <RelativeLayout
+            android:id="@+id/fake"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/selected_image"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginBottom="20dp"
+            tools:layout_editor_absoluteX="14dp"
+            tools:layout_editor_absoluteY="16dp">
+
+            <Button
+                android:id="@+id/select_image"
+                android:layout_width="120dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:background="@drawable/dialogboxbutton"
+                android:drawableLeft="@drawable/ic_image"
+                android:fontFamily="@font/mm"
+                android:padding="10dp"
+                android:text="Select"
+                android:textColor="#ffff" />
+
+            <Button
+                android:id="@+id/upload_dialog_box"
+                android:layout_width="120dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:background="@drawable/dialogboxbutton"
+                android:drawableLeft="@drawable/ic_image"
+                android:fontFamily="@font/mm"
+                android:padding="10dp"
+                android:text="Upload"
+                android:textColor="#ffff" />
+        </RelativeLayout>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.cardview.widget.CardView>

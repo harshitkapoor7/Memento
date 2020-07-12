@@ -65,7 +65,7 @@ public class MyReminders extends AppCompatActivity implements DatePickerDialog.O
             recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
             updateList(db,dt,dTime,dDate);
             sortList(db,dt,dTime,dDate);
-            SharedPreferences sharedPreferences=getSharedPreferences("SharedPreferences",MODE_PRIVATE);
+            SharedPreferences sharedPreferences=getSharedPreferences(MainActivity.email,MODE_PRIVATE);
             SharedPreferences.Editor editor=sharedPreferences.edit();
             Gson gson1=new Gson();
             String json=gson1.toJson(dt);
@@ -227,7 +227,7 @@ public class MyReminders extends AppCompatActivity implements DatePickerDialog.O
                         now.get(Calendar.HOUR_OF_DAY) + " " +
                         now.get(Calendar.MINUTE));
 
-                SharedPreferences sp=getSharedPreferences("SharedPreferences",MODE_PRIVATE);
+                SharedPreferences sp=getSharedPreferences(MainActivity.email,MODE_PRIVATE);
 
 
 

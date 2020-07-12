@@ -45,6 +45,35 @@
             android:layout_width="150dp"
             android:layout_height="wrap_content"
             android:background="@drawable/bottomsheetbutton"
+            android:id="@+id/uploadImage"
+            android:layout_alignParentLeft="true"
+            android:drawableLeft="@drawable/ic_image"
+            android:text="Upload"
+            android:textColor="#ffff"
+            android:padding="15dp"/>
+        <Button
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bottomsheetbutton"
+            android:drawableLeft="@drawable/ic_image"
+            android:id="@+id/viewImage"
+            android:text="View"
+            android:layout_alignParentRight="true"
+            android:textColor="#ffff"
+            android:padding="15dp"/>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:orientation="horizontal">
+        <Button
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bottomsheetbutton"
             android:id="@+id/reminderButton"
             android:layout_alignParentLeft="true"
             android:text="Add Reminder"
@@ -60,5 +89,7 @@
             android:textColor="#ffff"
             android:padding="15dp"/>
     </RelativeLayout>
+
+
 
 </LinearLayout>

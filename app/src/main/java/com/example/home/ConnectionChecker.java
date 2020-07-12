@@ -27,7 +27,7 @@ public class ConnectionChecker extends AppCompatActivity {
             public void onClick(View view) {
                 if (ConnChecker.check(getBaseContext()) == true) {
 
-                    Intent intent=new Intent(view.getContext(),MainActivity.class);
+                    Intent intent=new Intent(view.getContext(),LoginActivity.class);
                     getSupportActionBar().show();
 //                    getActionBar().show();
                     startActivity(intent);

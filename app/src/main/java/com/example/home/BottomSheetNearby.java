@@ -50,7 +50,6 @@ public class BottomSheetNearby extends BottomSheetDialogFragment {
     }
 
     public interface BottomSheetNearbyListener {
-        void onCardClick();
     }
 
 }

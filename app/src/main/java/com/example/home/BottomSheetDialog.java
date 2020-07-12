@@ -18,7 +18,7 @@ public class BottomSheetDialog extends BottomSheetDialogFragment {
     private BottomSheetListener listener;
     String title;
     TextView locName;
-    Button reminder,close;
+    Button reminder,close,viewImage,uploadImage;
     BottomSheetDialog(String title){
         this.title=title;
     }
@@ -32,6 +32,8 @@ public class BottomSheetDialog extends BottomSheetDialogFragment {
 
         reminder=view.findViewById(R.id.reminderButton);
         close=view.findViewById(R.id.closeButton);
+        viewImage=view.findViewById(R.id.viewImage);
+        uploadImage=view.findViewById(R.id.uploadImage);
 
         reminder.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -47,11 +49,28 @@ public class BottomSheetDialog extends BottomSheetDialogFragment {
                 dismiss();
             }
         });
+        viewImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                listener.onViewClick(title);
+                dismiss();
+            }
+        });
+
+        uploadImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                listener.onUploadCLick(title);
+                dismiss();
+            }
+        });
         return view;
     }
 
     public interface BottomSheetListener{
         void onBtnClick(String str);
+        void onUploadCLick(String str);
+        void onViewClick(String str);
     }
 
     @Override

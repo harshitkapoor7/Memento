@@ -104,11 +104,6 @@ public class ListItemsAdapter extends RecyclerView.Adapter<ListItemsAdapter.List
         } else {
             holder.status.setVisibility(View.GONE);
         }
-//        holder.placeType.setText(hashMap.get("type"));
-//        String url="https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference="+hashMap.get("photoRef")
-//                +"&key=AIzaSyDYoQybddM6c-Daz0bHVe7h2tuyzxHmW1k";
-//        ImageLoader imageLoader=new ImageLoader(imageView);
-//        imageLoader.execute(url);
 
     }
 

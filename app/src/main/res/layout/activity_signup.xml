@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/background"
+    android:orientation="vertical"
+    android:paddingLeft="20dp"
+    android:paddingTop="20dp"
+    android:paddingRight="20dp"
+    android:paddingBottom="20dp"
+    tools:context=".SignupActivity">
+
+    <LinearLayout
+        android:layout_width="391dp"
+        android:layout_height="468dp"
+        android:layout_centerVertical="true"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_margin="15dp"
+            android:fontFamily="@font/roboto_thin"
+            android:text="Register Yourself"
+            android:textColor="#00ffff"
+            android:textSize="28dp"
+            android:textStyle="bold"/>
+
+        <EditText
+            android:id="@+id/editTextName"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="15dp"
+            android:layout_marginBottom="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginTop="20dp"
+            android:layout_gravity="center"
+            android:fontFamily="@font/roboto_thin"
+            android:hint="Name"
+            android:backgroundTint="#00ffff"
+            android:drawableLeft="@drawable/ic_name"
+            android:drawablePadding="10dp"
+            android:inputType="textPersonName"
+            android:textColor="#88d8c0"
+            android:textColorHint="#88d8c0" />
+
+        <EditText
+            android:id="@+id/editTextEmail"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="15dp"
+            android:fontFamily="@font/roboto_thin"
+            android:hint="Email"
+            android:backgroundTint="#00ffff"
+            android:drawableLeft="@drawable/ic_email"
+            android:drawablePadding="10dp"
+            android:inputType="textEmailAddress"
+            android:textColor="#88d8c0"
+            android:textColorHint="#88d8c0" />
+
+        <EditText
+            android:id="@+id/editTextPassword"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="15dp"
+            android:fontFamily="@font/roboto_thin"
+            android:hint="Password"
+            android:backgroundTint="#00ffff"
+            android:drawableLeft="@drawable/ic_password"
+            android:drawablePadding="10dp"
+            android:inputType="textPassword"
+            android:textColor="#88d8c0"
+            android:textColorHint="#88d8c0" />
+
+        <Button
+            android:id="@+id/buttonSignup"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="15dp"
+            android:fontFamily="@font/roboto_thin"
+            android:background="@drawable/login_signup_button"
+            android:textColor="#ffffff"
+            android:text="signup" />
+
+        <TextView
+            android:id="@+id/textViewSignin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="15dp"
+            android:fontFamily="@font/roboto_thin"
+            android:text="Already Registered? Signin Here"
+            android:textAlignment="center"
+            android:textColor="#00ffff" />
+
+
+    </LinearLayout>
+
+</RelativeLayout>

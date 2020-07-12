@@ -8,7 +8,7 @@
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Add a note..."
+        android:hint="Remind me to..."
         android:gravity="center_horizontal"
         android:textSize="15sp"
         android:layout_marginLeft="14dp"
