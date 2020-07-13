@@ -82,7 +82,6 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_margin="15dp"
-            android:fontFamily="@font/roboto_thin"
             android:background="@drawable/login_signup_button"
             android:textColor="#ffffff"
             android:text="signup" />

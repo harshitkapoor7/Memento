@@ -24,7 +24,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
-import android.text.format.DateFormat;
+import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -54,11 +54,6 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.recyclerview.widget.RecyclerView;
-
-import com.allyants.notifyme.NotificationPublisher;
-import com.allyants.notifyme.NotifyMe;
-import com.google.android.gms.auth.api.signin.internal.Storage;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
@@ -86,17 +81,8 @@ import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.UploadTask;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.karumi.dexter.Dexter;
-import com.karumi.dexter.PermissionToken;
-import com.karumi.dexter.listener.PermissionDeniedResponse;
-import com.karumi.dexter.listener.PermissionGrantedResponse;
-import com.karumi.dexter.listener.PermissionRequest;
-import com.karumi.dexter.listener.single.PermissionListener;
 import com.squareup.picasso.Picasso;
-
 import java.lang.reflect.Type;
-import java.sql.Time;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -107,21 +93,20 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         TimePickerDialog.OnTimeSetListener {
 
     private FloatingActionButton button;
-    private ConstraintLayout cl;
     private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
     private static final String COURSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1234;
     private static final float DEFAULT_ZOOM = 15f;
     private Boolean mLocationPermissionsGranted = false;
     private GoogleMap mMap;
-    private FusedLocationProviderClient mFusedLocationProviderClient, fusedLocationProviderClient;
+    private FusedLocationProviderClient mFusedLocationProviderClient;
     private AutoCompleteTextView search;
     DrawerLayout drawerLayout;
     ActionBarDrawerToggle toggle;
     private ProgressBar pb;
     LocationManager lm;
     private ImageView cancel;
-    private Double lat, lng;
+    public static Double lat, lng;
     private ProgressDialog progressDialog;
 
     private Uri mImageUri;
@@ -133,16 +118,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public static String email = null;
     private StorageTask mUploadTask;
 
-    public static MainActivity getInstance() {
-        return instance;
-    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
-
+        lat= 0.0;
+        lng= 0.0;
         getLocationPermission();
 
         email = getIntent().getStringExtra("email");
@@ -161,39 +144,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
         progressDialog = new ProgressDialog(this);
-
-        Dexter.withActivity(this)
-                .withPermission(Manifest.permission.ACCESS_FINE_LOCATION)
-                .withListener(new PermissionListener() {
-                    @Override
-                    public void onPermissionGranted(PermissionGrantedResponse response) {
-                        SharedPreferences sharedPreferences = getSharedPreferences(email, MODE_PRIVATE);
-                        Gson gson = new Gson();
-                        String json1 = sharedPreferences.getString("dataTitle", null);
-                        String json2 = sharedPreferences.getString("dataBody", null);
-                        String json3 = sharedPreferences.getString("dataTime", null);
-                        String json4 = sharedPreferences.getString("dataDate", null);
-
-                        ArrayList<String> dt, db, dtime, ddate;
-                        Type type = new TypeToken<ArrayList<String>>() {
-                        }.getType();
-                        dt = gson.fromJson(json1, type);
-                        db = gson.fromJson(json2, type);
-                        dtime = gson.fromJson(json3, type);
-                        ddate = gson.fromJson(json4, type);
-                        if (dt != null) {
-                            for (int i = 0; i < dt.size(); i++) {
-                                updateLocation(dt.get(i), db.get(i), getLatLngFromAddress(dt.get(i)).latitude, getLatLngFromAddress(dt.get(i)).longitude);
-                            }
-                        }
-                    }
-                    @Override
-                    public void onPermissionDenied(PermissionDeniedResponse response) {
-                    }
-                    @Override
-                    public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {
-                    }
-                }).check();
 
         drawerLayout = findViewById(R.id.drawer_layout);
         toggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.open, R.string.close);
@@ -243,15 +193,19 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     search.setText("");
             }
         });
-    }
 
-    private void updateLocation(String add, String bod, Double lat, Double lon) {
-        buildLocationRequest();
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED)
-            return;
-        fusedLocationProviderClient.requestLocationUpdates(locationRequest, getPendingIntent(add, bod, lat, lon));
+
+
+
+
+//        SharedPreferences preferences=PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+//        SharedPreferences.Editor predEditor=preferences.edit();
+//        if(preferences.getString("service","").matches("")){
+//            predEditor.putString("service","service").commit();
+//
+//        }
+        Intent intent1=new Intent(this,BackgroundLocationService.class);
+        startService(intent1);
     }
 
     @Override
@@ -259,31 +213,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.settings, menu);
         return super.onCreateOptionsMenu(menu);
-    }
-
-    public PendingIntent getPendingIntent(String add, String bod, Double lat, Double lon) {
-        Intent alarmIntent = new Intent(getApplicationContext(), MyLocationService.class);
-        alarmIntent.setAction(MyLocationService.ACTION);
-        int request_Code = (int) (SystemClock.elapsedRealtime() * SystemClock.elapsedRealtime());
-        request_Code %= Integer.MAX_VALUE;
-
-        alarmIntent.putExtra("address", bod + "  at  " + add);
-        alarmIntent.putExtra("body", "You're within 250m of your pending task location");
-        alarmIntent.putExtra("lat", lat);
-        alarmIntent.putExtra("lon", lon);
-        alarmIntent.putExtra("req", request_Code);
-
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), request_Code, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        return pendingIntent;
-    }
-
-
-    private void buildLocationRequest() {
-        locationRequest = new LocationRequest();
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        locationRequest.setInterval(5000);
-        locationRequest.setFastestInterval(3000);
-        locationRequest.setSmallestDisplacement(10f);
     }
 
     public static double checkDistance(double lat1, double lat2, double lon1, double lon2) {
@@ -725,9 +654,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                         Upload upload1=new Upload(downloadUrl.toString());
                                         String uploadId=databaseReference.push().getKey();
                                         databaseReference.child(uploadId).setValue(upload1);
-//                                        Upload upload = new Upload(taskSnapshot.getUploadSessionUri().toString());
-//                                        String uploadId = databaseReference.push().getKey();
-//                                        databaseReference.child(uploadId).setValue(upload);
                                     }
                                 })
                                 .addOnFailureListener(new OnFailureListener() {

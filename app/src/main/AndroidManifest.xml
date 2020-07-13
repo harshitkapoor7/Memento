@@ -26,8 +26,6 @@
             android:name=".LoginActivity"
             android:theme="@style/AppThemeWithNoActionBar" />
 
-        <receiver android:name=".MyLocationService" />
-
         <activity
             android:name=".MyReminders"
             android:label="My Reminders" />
@@ -42,6 +40,8 @@
             android:name=".OrderReminderNotificationService"
             android:enabled="true"
             android:exported="false" />
+        <service
+            android:name=".BackgroundLocationService"/>
 
         <activity android:name=".ConnectionChecker" />
 

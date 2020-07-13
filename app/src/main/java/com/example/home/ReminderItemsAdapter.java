@@ -8,6 +8,8 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.Build;
 import android.os.Handler;
 import android.os.SystemClock;
@@ -26,12 +28,14 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 public class ReminderItemsAdapter extends RecyclerView.Adapter<ReminderItemsAdapter.ReminderItemsHolder> {
 
@@ -39,6 +43,7 @@ public class ReminderItemsAdapter extends RecyclerView.Adapter<ReminderItemsAdap
     SharedPreferences sharedPreferences;
     Context context;
     private OnEditClickListener listener;
+    Double val;
 
     ReminderItemsAdapter(ArrayList<String> dt, ArrayList<String> db, ArrayList<String> dTime, ArrayList<String> dDate, Context context) {
         this.dt = dt;
@@ -58,7 +63,7 @@ public class ReminderItemsAdapter extends RecyclerView.Adapter<ReminderItemsAdap
 
     public class ReminderItemsHolder extends RecyclerView.ViewHolder {
 
-        TextView title, body, time, date;
+        TextView title, body, time, date,distance;
         ImageView edit, delete;
 
         public ReminderItemsHolder(@NonNull final View itemView, final SharedPreferences sharedPreferences1, final OnEditClickListener listener) {
@@ -67,6 +72,7 @@ public class ReminderItemsAdapter extends RecyclerView.Adapter<ReminderItemsAdap
             body = itemView.findViewById(R.id.body);
             time = itemView.findViewById(R.id.rem_Time);
             date = itemView.findViewById(R.id.rem_Date);
+            distance=itemView.findViewById(R.id.distance);
             edit = itemView.findViewById(R.id.edit);
             delete = itemView.findViewById(R.id.delete);
             edit.setOnClickListener(new View.OnClickListener() {
@@ -105,6 +111,30 @@ public class ReminderItemsAdapter extends RecyclerView.Adapter<ReminderItemsAdap
         holder.body.setText(content);
         holder.time.setText(timeRem);
         holder.date.setText(dateRem);
+
+        Double lat=MainActivity.lat;
+        Double lng=MainActivity.lng;
+        LatLng latLng=getLatLngFromAddress(name);
+        if(lat!=0.0 && lng!=0.0){
+            val=MainActivity.checkDistance(latLng.latitude,lat,latLng.longitude,lng);
+            if(val<1000.0) {
+                int dis=(int)MainActivity.checkDistance(latLng.latitude,lat,latLng.longitude,lng);
+                String tx= String.valueOf(dis);
+                tx+=" m away";
+                holder.distance.setText(tx);
+            }
+            else{
+                val/=1000;
+                String tx=String.valueOf(val);
+                tx=tx.substring(0,Math.min(4,tx.length()));
+                tx+=" kms away";
+                holder.distance.setText(tx);
+            }
+        }
+        else{
+            holder.distance.setText("Turn on Gps to know distance");
+        }
+
     }
 
     @Override
@@ -153,6 +183,27 @@ public class ReminderItemsAdapter extends RecyclerView.Adapter<ReminderItemsAdap
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context,request_Code,new Intent(context,MyBroadcastReceiver.class),0);
         AlarmManager alarmManager= (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         alarmManager.cancel(pendingIntent);
+    }
+
+    public LatLng getLatLngFromAddress(String address) {
+
+        Geocoder geocoder = new Geocoder(context);
+        List<Address> addressList;
+
+        try {
+            addressList = geocoder.getFromLocationName(address, 1);
+            if (addressList != null) {
+                Address singleaddress = addressList.get(0);
+                LatLng latLng = new LatLng(singleaddress.getLatitude(), singleaddress.getLongitude());
+                return latLng;
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+
     }
 
 }

@@ -40,6 +40,7 @@ public class ImagesActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         recyclerView=findViewById(R.id.recycler_view_images);
+        recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         progressBar=findViewById(R.id.prgbar);
         tv=findViewById(R.id.tv);
