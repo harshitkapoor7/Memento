@@ -11,7 +11,7 @@ import java.util.List;
 public class DataParser {
     private HashMap<String, String> getSingleNearbyPlace(JSONObject googlePlaceJSON) {
         HashMap<String, String> googlePlaceMap = new HashMap<>();
-        String name = "", vicinity = "", latitude = "", longitude = "", reference, status = "--NA--", rating = "--NA--", type = "", photoRef = "";
+        String name = "", vicinity = "", latitude = "", longitude = "", status = "--NA--", rating = "--NA--", type = "", photoRef = "";
 
         try {
             if (!googlePlaceJSON.isNull("name"))
@@ -20,8 +20,6 @@ public class DataParser {
                 vicinity = googlePlaceJSON.getString("vicinity");
             latitude = googlePlaceJSON.getJSONObject("geometry").getJSONObject("location").getString("lat");
             longitude = googlePlaceJSON.getJSONObject("geometry").getJSONObject("location").getString("lng");
-//            reference=googlePlaceJSON.getString("reference");
-//            if(!googlePlaceJSON.getJSONObject.isNull("opening_hours"))
             if (!googlePlaceJSON.isNull("opening_hours")) {
                 if (googlePlaceJSON.getJSONObject("opening_hours").getBoolean("open_now") == true)
                     status = "true";
@@ -32,24 +30,15 @@ public class DataParser {
                 rating = googlePlaceJSON.getString("rating");
             if (!googlePlaceJSON.isNull("user_ratings_total"))
                 rating += "/5 (" + googlePlaceJSON.getString("user_ratings_total") + ")";
-//            if(googlePlaceJSON.getJSONArray("types").length()>0) {
-//                JSONArray jsonArray = googlePlaceJSON.getJSONArray("types");
-//                for (int i = 0; i < 1; i++)
-//                    type = jsonArray.getJSONObject(i).toString();
-//            }
-//            JSONArray jsonArray=googlePlaceJSON.getJSONArray("photos");
-//            for(int i=0;i<1;i++)
-//                photoRef=jsonArray.getJSONObject(i).getString("photo_reference");
+
 
             googlePlaceMap.put("name", name);
             googlePlaceMap.put("vicinity", vicinity);
             googlePlaceMap.put("latitude", latitude);
             googlePlaceMap.put("longitude", longitude);
-//            googlePlaceMap.put("reference",reference);
             googlePlaceMap.put("rating", rating);
             googlePlaceMap.put("status", status);
             googlePlaceMap.put("type",type);
-//            googlePlaceMap.put("photoRef",photoRef);
 
         } catch (JSONException e) {
             e.printStackTrace();

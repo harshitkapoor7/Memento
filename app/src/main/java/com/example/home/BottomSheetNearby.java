@@ -21,6 +21,7 @@ import java.util.List;
 public class BottomSheetNearby extends BottomSheetDialogFragment {
     private BottomSheetDialog.BottomSheetListener listener;
     RecyclerView recyclerView;
+    TextView placeType;
     List<HashMap<String, String>> list;
     String type;
 
@@ -34,7 +35,19 @@ public class BottomSheetNearby extends BottomSheetDialogFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.bottom_sheet_nearby, container, false);
         recyclerView = view.findViewById(R.id.recycler_view);
+        placeType=view.findViewById(R.id.place_type);
+        if(type == "res")
+            placeType.setText("RESTAURANTS");
+        if(type == "hos")
+            placeType.setText("HOSPITALS");
+        if(type == "malls")
+            placeType.setText("SHOPPING MALLS");
+        if(type == "hotel")
+            placeType.setText("HOTELS");
+        if(type == "atm")
+            placeType.setText("ATM");
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.setHasFixedSize(true);
         ListItemsAdapter listItemsAdapter = new ListItemsAdapter(list, type);
         recyclerView.setAdapter(listItemsAdapter);
         listItemsAdapter.setOnItemClickListener(new ListItemsAdapter.OnItemClickListener() {

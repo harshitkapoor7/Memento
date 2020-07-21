@@ -127,7 +127,7 @@ public class BackgroundLocationService extends Service implements LocationListen
                     return;
                 }
                 System.out.println("Idhar hai");
-                locationManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, 300000, 0, locationListeners[0]);
+                locationManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, 1800*1000, 0, locationListeners[0]);
             }catch (Exception e){
                 e.printStackTrace();
             }

@@ -91,17 +91,6 @@
                     android:textSize="18sp" />
             </LinearLayout>
 
-
-<!--                <TextView-->
-<!--                    android:id="@+id/place_type"-->
-<!--                    android:layout_width="match_parent"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:text="Type"-->
-<!--                    android:textSize="30dp" />-->
-
-
-
-
             <ImageView
                 android:id="@+id/img"
                 android:src="@drawable/ic_location"

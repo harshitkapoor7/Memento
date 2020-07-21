@@ -37,12 +37,11 @@ public class ListItemsAdapter extends RecyclerView.Adapter<ListItemsAdapter.List
 
     public static class ListItemHolder extends RecyclerView.ViewHolder {
         ImageView imageView;
-        TextView status, rating, address, name, placeType;
+        TextView status, rating, address, name;
 
         public ListItemHolder(@NonNull View itemView, final OnItemClickListener listener) {
             super(itemView);
             imageView = itemView.findViewById(R.id.img);
-//            placeType=itemView.findViewById(R.id.place_type);
             status = itemView.findViewById(R.id.status);
             rating = itemView.findViewById(R.id.rating);
             address = itemView.findViewById(R.id.place_address);

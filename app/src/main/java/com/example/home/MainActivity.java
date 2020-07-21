@@ -13,11 +13,13 @@ import android.app.TimePickerDialog;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Build;
@@ -54,9 +56,18 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.Result;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -82,15 +93,18 @@ import com.google.firebase.storage.UploadTask;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.squareup.picasso.Picasso;
+
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 
+import static android.view.View.GONE;
+
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, NavigationView.OnNavigationItemSelectedListener,
         BottomSheetDialog.BottomSheetListener, BottomSheetNearby.BottomSheetNearbyListener, DatePickerDialog.OnDateSetListener,
-        TimePickerDialog.OnTimeSetListener {
+        TimePickerDialog.OnTimeSetListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, ResultCallback {
 
     private FloatingActionButton button;
     private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
@@ -108,13 +122,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private ImageView cancel;
     public static Double lat, lng;
     private ProgressDialog progressDialog;
+    private LocationRequest locationRequest;
+    private GoogleApiClient googleApiClient;
+    private Boolean isGpsOn =false;
 
     private Uri mImageUri;
     private StorageReference storageReference;
     private DatabaseReference databaseReference;
 
     static MainActivity instance;
-    LocationRequest locationRequest;
     public static String email = null;
     private StorageTask mUploadTask;
 
@@ -124,9 +140,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
-        lat= 0.0;
-        lng= 0.0;
+        lat = 0.0;
+        lng = 0.0;
         getLocationPermission();
+        mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
         email = getIntent().getStringExtra("email");
         if (email != null) {
@@ -139,8 +156,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             email = sharedPreferences.getString("email", "");
         }
 
-        SharedPreferences sharedPreferences=getSharedPreferences(email+email,Context.MODE_PRIVATE);
-        String nameEditText=sharedPreferences.getString("EditTextName","");
+        SharedPreferences sharedPreferences = getSharedPreferences(email + email, Context.MODE_PRIVATE);
+        String nameEditText = sharedPreferences.getString("EditTextName", "");
 
 
         progressDialog = new ProgressDialog(this);
@@ -154,11 +171,22 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         navigationView.setNavigationItemSelectedListener(this);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
-        View headerView =navigationView.getHeaderView(0);
-        TextView fullName=headerView.findViewById(R.id.fullName);
-        TextView emailIdNav=headerView.findViewById(R.id.emailIdNav);
+        View headerView = navigationView.getHeaderView(0);
+        TextView fullName = headerView.findViewById(R.id.fullName);
+        TextView emailIdNav = headerView.findViewById(R.id.emailIdNav);
         fullName.setText(nameEditText);
         emailIdNav.setText(email);
+
+
+        googleApiClient = new GoogleApiClient.Builder(this)
+                .addApi(LocationServices.API)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this).build();
+        googleApiClient.connect();
+        locationRequest = LocationRequest.create();
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest.setInterval(30 * 1000);
+        locationRequest.setFastestInterval(5 * 1000);
 
         search = findViewById(R.id.searchBar);
         search.setDropDownBackgroundResource(R.color.autocomplete_bgc);
@@ -170,7 +198,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         lm = (LocationManager)
                 getSystemService(Context.LOCATION_SERVICE);
-        turnGpsOnAndFindLocation(0);
+        if(lm.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+            getDeviceLocation(0);
+        }
         button.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -195,16 +225,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
 
 
-
-
-
-//        SharedPreferences preferences=PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-//        SharedPreferences.Editor predEditor=preferences.edit();
-//        if(preferences.getString("service","").matches("")){
-//            predEditor.putString("service","service").commit();
-//
-//        }
-        Intent intent1=new Intent(this,BackgroundLocationService.class);
+        Intent intent1 = new Intent(this, BackgroundLocationService.class);
         startService(intent1);
     }
 
@@ -276,35 +297,18 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
 
-
     public void turnGpsOnAndFindLocation(final int flag) {
         if (!lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             Toast.makeText(MainActivity.this, "Turn on GPS", Toast.LENGTH_SHORT).show();
-            pb.setVisibility(View.VISIBLE);
-            cancel.setVisibility(View.GONE);
-            Toast.makeText(MainActivity.this, "Fetching Your Location", Toast.LENGTH_LONG).show();
-            new GpsUtils(MainActivity.this).turnGPSOn(new GpsUtils.onGpsListener() {
-                @Override
-                public void gpsStatus(boolean isGPSEnable) {
 
-                }
-            });
-            Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
+            LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder().addLocationRequest(locationRequest);
+            builder.setAlwaysShow(true);
+            PendingResult result = LocationServices.SettingsApi.checkLocationSettings(googleApiClient, builder.build());
+            result.setResultCallback(this);
 
-                    if (lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-                        getDeviceLocation(flag);
-                        pb.setVisibility(View.GONE);
-                        cancel.setVisibility(View.VISIBLE);
-                    }
-                }
-            }, 11000);
+
         } else {
             getDeviceLocation(flag);
-            pb.setVisibility(View.GONE);
-            cancel.setVisibility(View.VISIBLE);
         }
     }
 
@@ -338,12 +342,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+    public boolean onNavigationItemSelected(@NonNull final MenuItem item) {
         if (ConnChecker.check(getBaseContext()) == false) {
             Intent intent = new Intent(getApplicationContext(), ConnectionChecker.class);
             startActivity(intent);
             finish();
-        } else {
+        } else if(lm.isProviderEnabled(LocationManager.GPS_PROVIDER)){
             int id = item.getItemId();
             Object transferData[] = new Object[2];
             transferData[0] = mMap;
@@ -354,7 +358,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             switch (id) {
                 case R.id.remMenu:
-                    Intent intent = new Intent(this, MyReminders.class);
+                    Intent intent = new Intent(getApplicationContext(), MyReminders.class);
                     SharedPreferences sharedPreferences = getSharedPreferences(email, MODE_PRIVATE);
                     Gson gson = new Gson();
                     String json1 = sharedPreferences.getString("dataTitle", null);
@@ -377,7 +381,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     break;
                 case R.id.restaurant:
                     mMap.clear();
-                    pb.setBackgroundColor(getResources().getColor(R.color.black));
                     pb.setVisibility(View.VISIBLE);
                     url = getURL(lat, lng, "restaurant");
                     transferData[1] = url;
@@ -390,14 +393,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             BottomSheetNearby bottomSheetNearby = new BottomSheetNearby(list[0], "res");
                             bottomSheetNearby.show(getSupportFragmentManager(), "bottomNearby");
                             pb.setVisibility(View.INVISIBLE);
-                            pb.setBackgroundColor(getResources().getColor(R.color.colorAccent));
                         }
                     }, 1500);
                     break;
 
                 case R.id.hospital:
                     mMap.clear();
-                    pb.setBackgroundColor(getResources().getColor(R.color.black));
                     pb.setVisibility(View.VISIBLE);
                     url = getURL(lat, lng, "hospital");
                     transferData[1] = url;
@@ -410,14 +411,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             BottomSheetNearby bottomSheetNearby = new BottomSheetNearby(list[0], "hos");
                             bottomSheetNearby.show(getSupportFragmentManager(), "bottomNearby");
                             pb.setVisibility(View.INVISIBLE);
-                            pb.setBackgroundColor(getResources().getColor(R.color.colorAccent));
                         }
                     }, 1500);
                     break;
 
                 case R.id.malls:
                     mMap.clear();
-                    pb.setBackgroundColor(getResources().getColor(R.color.black));
                     pb.setVisibility(View.VISIBLE);
                     url = getURL(lat, lng, "shopping_mall");
                     transferData[1] = url;
@@ -429,14 +428,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             BottomSheetNearby bottomSheetNearby = new BottomSheetNearby(list[0], "malls");
                             bottomSheetNearby.show(getSupportFragmentManager(), "bottomNearby");
                             pb.setVisibility(View.INVISIBLE);
-                            pb.setBackgroundColor(getResources().getColor(R.color.colorAccent));
                         }
                     }, 1500);
                     break;
 
                 case R.id.hotel:
                     mMap.clear();
-                    pb.setBackgroundColor(getResources().getColor(R.color.black));
                     pb.setVisibility(View.VISIBLE);
                     url = getURL(lat, lng, "lodging");
                     transferData[1] = url;
@@ -448,14 +445,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             BottomSheetNearby bottomSheetNearby = new BottomSheetNearby(list[0], "hotel");
                             bottomSheetNearby.show(getSupportFragmentManager(), "bottomNearby");
                             pb.setVisibility(View.INVISIBLE);
-                            pb.setBackgroundColor(getResources().getColor(R.color.colorAccent));
                         }
                     }, 1500);
                     break;
 
                 case R.id.atm:
                     mMap.clear();
-                    pb.setBackgroundColor(getResources().getColor(R.color.black));
                     pb.setVisibility(View.VISIBLE);
                     url = getURL(lat, lng, "atm");
                     transferData[1] = url;
@@ -467,12 +462,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             BottomSheetNearby bottomSheetNearby = new BottomSheetNearby(list[0], "atm");
                             bottomSheetNearby.show(getSupportFragmentManager(), "bottomNearby");
                             pb.setVisibility(View.INVISIBLE);
-                            pb.setBackgroundColor(getResources().getColor(R.color.colorAccent));
                         }
                     }, 1500);
                     break;
             }
             drawerLayout.closeDrawer(GravityCompat.START);
+        }
+        else{
+            drawerLayout.closeDrawer(GravityCompat.START);
+            turnGpsOnAndFindLocation(0);
         }
         return true;
     }
@@ -512,15 +510,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
     public void getDeviceLocation(final int flag) {
-        mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+
 
         try {
             if (mLocationPermissionsGranted) {
 
                 final Task location = mFusedLocationProviderClient.getLastLocation();
-                location.addOnCompleteListener(new OnCompleteListener() {
+                location.addOnCompleteListener(new OnCompleteListener<Location>() {
                     @Override
-                    public void onComplete(@NonNull Task task) {
+                    public void onComplete(@NonNull Task<Location> task) {
                         if (task.isSuccessful()) {
                             Location currentLocation = (Location) task.getResult();
 
@@ -541,8 +539,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         } catch (SecurityException e) {
         }
-        System.out.println("main act" + lat + lng);
-        System.out.println("main ac");
     }
 
 
@@ -601,7 +597,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
 
-
     private ImageView imgv;
 
     @Override
@@ -611,14 +606,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         imgv = view.findViewById(R.id.selected_image);
         Button select = view.findViewById(R.id.select_image);
         Button upload = view.findViewById(R.id.upload_dialog_box);
-        final ProgressBar pr=view.findViewById(R.id.progress_horizontal_dialog);
+        final ProgressBar pr = view.findViewById(R.id.progress_horizontal_dialog);
         long val = 0;
-        for(int i=0;i<str.length();i++)
-            val+=(long)str.charAt(i);
-        String st=Long.toString(val);
-        System.out.println(email+" "+st);
-        storageReference = FirebaseStorage.getInstance().getReference(email.substring(0, email.length() - 4)+st);
-        databaseReference = FirebaseDatabase.getInstance().getReference(email.substring(0, email.length() - 4)+st);
+        for (int i = 0; i < str.length(); i++)
+            val += (long) str.charAt(i);
+        String st = Long.toString(val);
+        System.out.println(email + " " + st);
+        storageReference = FirebaseStorage.getInstance().getReference(email.substring(0, email.length() - 4) + st);
+        databaseReference = FirebaseDatabase.getInstance().getReference(email.substring(0, email.length() - 4) + st);
 
         select.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -648,11 +643,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                             }
                                         }, 1500);
                                         Toast.makeText(getApplicationContext(), "Upload Successful", Toast.LENGTH_LONG).show();
-                                        Task<Uri> uriTask=taskSnapshot.getStorage().getDownloadUrl();
-                                        while(!uriTask.isSuccessful());
-                                        Uri downloadUrl=uriTask.getResult();
-                                        Upload upload1=new Upload(downloadUrl.toString());
-                                        String uploadId=databaseReference.push().getKey();
+                                        Task<Uri> uriTask = taskSnapshot.getStorage().getDownloadUrl();
+                                        while (!uriTask.isSuccessful()) ;
+                                        Uri downloadUrl = uriTask.getResult();
+                                        Upload upload1 = new Upload(downloadUrl.toString());
+                                        String uploadId = databaseReference.push().getKey();
                                         databaseReference.child(uploadId).setValue(upload1);
                                     }
                                 })
@@ -688,7 +683,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void openFileChooser() {
-        mImageUri=null;
+        mImageUri = null;
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
@@ -697,19 +692,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == 1 && resultCode == RESULT_OK && data != null && data.getData() != null) {
-            mImageUri = data.getData();
-            Picasso.with(this).load(mImageUri).into(imgv);
-        }
-    }
-
-    @Override
     public void onViewClick(String str) {
-        Intent intent=new Intent(this,ImagesActivity.class);
-        intent.putExtra("location",str);
+        Intent intent = new Intent(this, ImagesActivity.class);
+        intent.putExtra("location", str);
         startActivity(intent);
     }
 
@@ -732,6 +717,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         DatePickerDialog dpd = new DatePickerDialog(this, this, y, mon, d);
         dpd.show();
     }
+
     private ArrayList<String> dataTitle;
     private ArrayList<String> dataBody, dataTime, dataDate;
 
@@ -748,6 +734,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onTimeSet(TimePicker timePicker, int i, int i1) {
         now.set(Calendar.HOUR_OF_DAY, i);
         now.set(Calendar.MINUTE, i1);
+        now.set(Calendar.SECOND,0);
 
 
         final AlertDialog alertDialog = new AlertDialog.Builder(this).create();
@@ -865,5 +852,68 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, mills, pendingIntent);
 
         Toast.makeText(this, "Alarm set at " + h + ":" + min + " on " + d + "/" + (mon + 1) + "/" + y, Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder().addLocationRequest(locationRequest);
+        builder.setAlwaysShow(true);
+        PendingResult result = LocationServices.SettingsApi.checkLocationSettings(googleApiClient, builder.build());
+        result.setResultCallback(this);
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+    }
+
+    @Override
+    public void onResult(@NonNull Result result) {
+        final Status status = result.getStatus();
+        switch (status.getStatusCode()) {
+            case LocationSettingsStatusCodes.SUCCESS:
+                break;
+            case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+                try {
+                    status.startResolutionForResult(this, 9742);
+                } catch (IntentSender.SendIntentException e) {
+                }
+            case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
+                break;
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+
+        if (requestCode == 9742) {
+            if (resultCode == RESULT_OK) {
+                Toast.makeText(this, "GPS Enabled", Toast.LENGTH_SHORT).show();
+                isGpsOn=true;
+                Handler handler = new Handler();
+                pb.setVisibility(View.VISIBLE);
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(MainActivity.this, "Fetching Your Location", Toast.LENGTH_LONG).show();
+                        getDeviceLocation(0);
+                        pb.setVisibility(GONE);
+                    }
+                }, 10 * 1000);
+            } else
+                Toast.makeText(this, "GPS Disabled", Toast.LENGTH_SHORT).show();
+        }
+
+        if (requestCode == 1 && resultCode == RESULT_OK && data != null && data.getData() != null) {
+            mImageUri = data.getData();
+            Picasso.with(this).load(mImageUri).into(imgv);
+        }
     }
 }
