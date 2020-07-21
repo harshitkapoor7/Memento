@@ -332,7 +332,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         return super.onOptionsItemSelected(item);
     }
 
-    private String getURL(double lat, double lng, String placetype ) {
+    private String getURL(double lat, double lng, String placetype) {
         StringBuilder link = new StringBuilder("https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=");
         link.append(lat + "," + lng);
         link.append("&radius=5500&type=" + placetype);
