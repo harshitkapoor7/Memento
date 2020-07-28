@@ -12,9 +12,9 @@ An android application to help you in your daily chores and pending tasks with r
 ## Advanced Features
 
 - Tracking user location in background and when app is killed.
+- Reminders along with being time specific would pop up as the user reaches in a proximity of 250 meters or less from any of his/her active reminders.
 - User may save location specific photos, experiences for future memories.
 - User may retrieve his saved photos by viewing the locations where he/she saved them.
 - Fetch nearby facilites like restaurants,shopping malls, atms, hotels, hospitals etc. along with their ratings, opening and closing time.
-- Reminders along being time specific would pop up as the user reaches in a proximity of 250 metres or less from any of his/her active reminders.
 - User may set multiple reminders at multiple locations.
 
