@@ -22,6 +22,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -72,6 +73,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -94,6 +96,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.squareup.picasso.Picasso;
 
+import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -340,140 +343,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         return link.toString();
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    @Override
-    public boolean onNavigationItemSelected(@NonNull final MenuItem item) {
-        if (ConnChecker.check(getBaseContext()) == false) {
-            Intent intent = new Intent(getApplicationContext(), ConnectionChecker.class);
-            startActivity(intent);
-            finish();
-        } else if(lm.isProviderEnabled(LocationManager.GPS_PROVIDER)){
-            int id = item.getItemId();
-            Object transferData[] = new Object[2];
-            transferData[0] = mMap;
-            final GetNearbyPlaces getNearbyPlaces = new GetNearbyPlaces();
-            String url = "";
-            final List<HashMap<String, String>>[] list = new List[1];
-            Handler handler = new Handler();
 
-            switch (id) {
-                case R.id.remMenu:
-                    Intent intent = new Intent(getApplicationContext(), MyReminders.class);
-                    SharedPreferences sharedPreferences = getSharedPreferences(email, MODE_PRIVATE);
-                    Gson gson = new Gson();
-                    String json1 = sharedPreferences.getString("dataTitle", null);
-                    String json2 = sharedPreferences.getString("dataBody", null);
-                    String json3 = sharedPreferences.getString("dataTime", null);
-                    String json4 = sharedPreferences.getString("dataDate", null);
-
-                    ArrayList<String> dt, db, dtime, ddate;
-                    Type type = new TypeToken<ArrayList<String>>() {
-                    }.getType();
-                    dt = gson.fromJson(json1, type);
-                    db = gson.fromJson(json2, type);
-                    dtime = gson.fromJson(json3, type);
-                    ddate = gson.fromJson(json4, type);
-                    intent.putExtra("dataTitle", dt);
-                    intent.putExtra("dataBody", db);
-                    intent.putExtra("dataTime", dtime);
-                    intent.putExtra("dataDate", ddate);
-                    startActivity(intent);
-                    break;
-                case R.id.restaurant:
-                    mMap.clear();
-                    pb.setVisibility(View.VISIBLE);
-                    url = getURL(lat, lng, "restaurant");
-                    transferData[1] = url;
-                    getNearbyPlaces.execute(transferData);
-
-                    handler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            list[0] = getNearbyPlaces.nearbyPlacesList;
-                            BottomSheetNearby bottomSheetNearby = new BottomSheetNearby(list[0], "res");
-                            bottomSheetNearby.show(getSupportFragmentManager(), "bottomNearby");
-                            pb.setVisibility(View.INVISIBLE);
-                        }
-                    }, 1500);
-                    break;
-
-                case R.id.hospital:
-                    mMap.clear();
-                    pb.setVisibility(View.VISIBLE);
-                    url = getURL(lat, lng, "hospital");
-                    transferData[1] = url;
-                    getNearbyPlaces.execute(transferData);
-                    System.out.println(url);
-                    handler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            list[0] = getNearbyPlaces.nearbyPlacesList;
-                            BottomSheetNearby bottomSheetNearby = new BottomSheetNearby(list[0], "hos");
-                            bottomSheetNearby.show(getSupportFragmentManager(), "bottomNearby");
-                            pb.setVisibility(View.INVISIBLE);
-                        }
-                    }, 1500);
-                    break;
-
-                case R.id.malls:
-                    mMap.clear();
-                    pb.setVisibility(View.VISIBLE);
-                    url = getURL(lat, lng, "shopping_mall");
-                    transferData[1] = url;
-                    getNearbyPlaces.execute(transferData);
-                    handler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            list[0] = getNearbyPlaces.nearbyPlacesList;
-                            BottomSheetNearby bottomSheetNearby = new BottomSheetNearby(list[0], "malls");
-                            bottomSheetNearby.show(getSupportFragmentManager(), "bottomNearby");
-                            pb.setVisibility(View.INVISIBLE);
-                        }
-                    }, 1500);
-                    break;
-
-                case R.id.hotel:
-                    mMap.clear();
-                    pb.setVisibility(View.VISIBLE);
-                    url = getURL(lat, lng, "lodging");
-                    transferData[1] = url;
-                    getNearbyPlaces.execute(transferData);
-                    handler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            list[0] = getNearbyPlaces.nearbyPlacesList;
-                            BottomSheetNearby bottomSheetNearby = new BottomSheetNearby(list[0], "hotel");
-                            bottomSheetNearby.show(getSupportFragmentManager(), "bottomNearby");
-                            pb.setVisibility(View.INVISIBLE);
-                        }
-                    }, 1500);
-                    break;
-
-                case R.id.atm:
-                    mMap.clear();
-                    pb.setVisibility(View.VISIBLE);
-                    url = getURL(lat, lng, "atm");
-                    transferData[1] = url;
-                    getNearbyPlaces.execute(transferData);
-                    handler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            list[0] = getNearbyPlaces.nearbyPlacesList;
-                            BottomSheetNearby bottomSheetNearby = new BottomSheetNearby(list[0], "atm");
-                            bottomSheetNearby.show(getSupportFragmentManager(), "bottomNearby");
-                            pb.setVisibility(View.INVISIBLE);
-                        }
-                    }, 1500);
-                    break;
-            }
-            drawerLayout.closeDrawer(GravityCompat.START);
-        }
-        else{
-            drawerLayout.closeDrawer(GravityCompat.START);
-            turnGpsOnAndFindLocation(0);
-        }
-        return true;
-    }
 
 
     public LatLng getLatLngFromAddress(String address) {
@@ -916,4 +786,141 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             Picasso.with(this).load(mImageUri).into(imgv);
         }
     }
+
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    @Override
+    public boolean onNavigationItemSelected(@NonNull final MenuItem item) {
+        if (ConnChecker.check(getBaseContext()) == false) {
+            Intent intent = new Intent(getApplicationContext(), ConnectionChecker.class);
+            startActivity(intent);
+            finish();
+        } else if(lm.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+            int id = item.getItemId();
+            Object transferData[] = new Object[2];
+            transferData[0] = mMap;
+            final GetNearbyPlaces getNearbyPlaces = new GetNearbyPlaces();
+            String url = "";
+            final List<HashMap<String, String>>[] list = new List[1];
+            Handler handler = new Handler();
+
+            switch (id) {
+                case R.id.remMenu:
+                    Intent intent = new Intent(getApplicationContext(), MyReminders.class);
+                    SharedPreferences sharedPreferences = getSharedPreferences(email, MODE_PRIVATE);
+                    Gson gson = new Gson();
+                    String json1 = sharedPreferences.getString("dataTitle", null);
+                    String json2 = sharedPreferences.getString("dataBody", null);
+                    String json3 = sharedPreferences.getString("dataTime", null);
+                    String json4 = sharedPreferences.getString("dataDate", null);
+
+                    ArrayList<String> dt, db, dtime, ddate;
+                    Type type = new TypeToken<ArrayList<String>>() {
+                    }.getType();
+                    dt = gson.fromJson(json1, type);
+                    db = gson.fromJson(json2, type);
+                    dtime = gson.fromJson(json3, type);
+                    ddate = gson.fromJson(json4, type);
+                    intent.putExtra("dataTitle", dt);
+                    intent.putExtra("dataBody", db);
+                    intent.putExtra("dataTime", dtime);
+                    intent.putExtra("dataDate", ddate);
+                    startActivity(intent);
+                    break;
+                case R.id.restaurant:
+                    mMap.clear();
+                    pb.setVisibility(View.VISIBLE);
+                    url = getURL(lat, lng, "restaurant");
+                    transferData[1] = url;
+                    getNearbyPlaces.execute(transferData);
+
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            list[0] = getNearbyPlaces.nearbyPlacesList;
+                            BottomSheetNearby bottomSheetNearby = new BottomSheetNearby(list[0], "res");
+                            bottomSheetNearby.show(getSupportFragmentManager(), "bottomNearby");
+                            pb.setVisibility(View.INVISIBLE);
+                        }
+                    }, 1500);
+                    break;
+
+                case R.id.hospital:
+                    mMap.clear();
+                    pb.setVisibility(View.VISIBLE);
+                    url = getURL(lat, lng, "hospital");
+                    transferData[1] = url;
+                    getNearbyPlaces.execute(transferData);
+                    System.out.println(url);
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            list[0] = getNearbyPlaces.nearbyPlacesList;
+                            BottomSheetNearby bottomSheetNearby = new BottomSheetNearby(list[0], "hos");
+                            bottomSheetNearby.show(getSupportFragmentManager(), "bottomNearby");
+                            pb.setVisibility(View.INVISIBLE);
+                        }
+                    }, 1500);
+                    break;
+
+                case R.id.malls:
+                    mMap.clear();
+                    pb.setVisibility(View.VISIBLE);
+                    url = getURL(lat, lng, "shopping_mall");
+                    transferData[1] = url;
+                    getNearbyPlaces.execute(transferData);
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            list[0] = getNearbyPlaces.nearbyPlacesList;
+                            BottomSheetNearby bottomSheetNearby = new BottomSheetNearby(list[0], "malls");
+                            bottomSheetNearby.show(getSupportFragmentManager(), "bottomNearby");
+                            pb.setVisibility(View.INVISIBLE);
+                        }
+                    }, 1500);
+                    break;
+
+                case R.id.hotel:
+                    mMap.clear();
+                    pb.setVisibility(View.VISIBLE);
+                    url = getURL(lat, lng, "lodging");
+                    transferData[1] = url;
+                    getNearbyPlaces.execute(transferData);
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            list[0] = getNearbyPlaces.nearbyPlacesList;
+                            BottomSheetNearby bottomSheetNearby = new BottomSheetNearby(list[0], "hotel");
+                            bottomSheetNearby.show(getSupportFragmentManager(), "bottomNearby");
+                            pb.setVisibility(View.INVISIBLE);
+                        }
+                    }, 1500);
+                    break;
+
+                case R.id.atm:
+                    mMap.clear();
+                    pb.setVisibility(View.VISIBLE);
+                    url = getURL(lat, lng, "atm");
+                    transferData[1] = url;
+                    getNearbyPlaces.execute(transferData);
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            list[0] = getNearbyPlaces.nearbyPlacesList;
+                            BottomSheetNearby bottomSheetNearby = new BottomSheetNearby(list[0], "atm");
+                            bottomSheetNearby.show(getSupportFragmentManager(), "bottomNearby");
+                            pb.setVisibility(View.INVISIBLE);
+                        }
+                    }, 1500);
+                    break;
+            }
+            drawerLayout.closeDrawer(GravityCompat.START);
+        }
+        else{
+            drawerLayout.closeDrawer(GravityCompat.START);
+            turnGpsOnAndFindLocation(0);
+        }
+        return true;
+    }
+
 }

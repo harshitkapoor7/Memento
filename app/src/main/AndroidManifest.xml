@@ -43,7 +43,8 @@
         <service
             android:name=".BackgroundLocationService"/>
 
-        <activity android:name=".ConnectionChecker" />
+        <activity android:name=".ConnectionChecker"
+            android:theme="@style/AppThemeWithNoActionBar"/>
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"

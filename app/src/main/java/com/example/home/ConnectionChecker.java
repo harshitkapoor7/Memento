@@ -20,7 +20,6 @@ public class ConnectionChecker extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_connection_checker);
         btn=findViewById(R.id.btn);
-        getSupportActionBar().hide();
 //        getActionBar().hide();
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -28,7 +27,7 @@ public class ConnectionChecker extends AppCompatActivity {
                 if (ConnChecker.check(getBaseContext()) == true) {
 
                     Intent intent=new Intent(view.getContext(),LoginActivity.class);
-                    getSupportActionBar().show();
+//                    getSupportActionBar().show();
 //                    getActionBar().show();
                     startActivity(intent);
                     finish();
